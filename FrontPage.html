@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+            
+	<?!= include('JavaScript.html'); ?>
+  <?!= include("StyleSheet.html"); ?>
+
+  <script>
+    window.onload = function() {
+
+    console.log("Hello world!");
+    runFirst();
+
+      }
+  </script>
+
+  </head>
+  <body>
+
+    <div class="container">
+        <!-- Page Content goes here -->
+     
+    <form class="col s12">
+
+      <!-- <div class="divider"></div> -->
+      
+
+      <div class="section">
+        <center>  <h5>  SHRI Private Practice Automation System v1.0 (beta)  | <a class="waves-effect waves-teal btn-flat">Dashboard</a></h5></center>
+        <!-- <a class="waves-effect waves-light btn">Dashboard</a> -->
+  
+      </div>
+
+    <div class="progress">
+      <div class="determinate" style="width: 100%"></div>
+    </div>
+
+      <!-- <div class="section">
+        <h5>1.0. System Details : </h5>
+      <div class="row">
+        <div class="input-field col s12">
+          <input  id="PresID" type="text" class="validate">
+          <label for="presID">1.0. Prescription ID : </label>
+        </div>
+
+      </div>
+      </div> -->
+
+       <div class="section">
+        <h5>1.0. Patient Details : </h5>
+      <div class="row">
+
+        <div class="input-field col s2.5">
+          <input  id="presID" type="text" class="validate" readonly>
+          <label for="presID">1.0. Prescription ID : </label>
+        </div>
+        <div class="input-field col s2.5">
+          <input  id="name" type="text" class="validate" style="text-transform:uppercase">
+          <label for="name">2.1. Patient Name : </label>
+        </div>
+        <div class="input-field col s2.5">
+          <input id="age" type="text" class="validate">
+          <label for="age">2.2. Patient Age : </label>
+        </div>
+        <div class="input-field col s2.5">
+         <select id="gender">
+          <option value="" disabled selected>Choose your option</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+        <label>2.3. Patient Sex :</label>
+        </div>
+        <div class="input-field col s2">
+          <input id="date" type="text" class="datepicker">
+          <label for="date">2.4. Date : </label>
+        </div>
+      </div>
+      </div>
+
+    
+
+       <div class="section">
+        <h5>2.0. Prescription : </h5>
+        <div class="row">
+
+        <div class="input-field col s1">
+      <label>1 ).</label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_1" class="form-control" name="drug_1"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_1','drug_freq_1','drug_dur_1','cost_1')">
+          <datalist id="drug_list"> 
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_1" class="form-control" name="drug_freq_1"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_1','drug_freq_1','drug_dur_1','cost_1')">
+          <datalist id="drug_feq_list"> 
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_1" class="form-control" name="drug_dur_1"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_1','drug_freq_1','drug_dur_1','cost_1')">
+          <datalist id="drug_dur_list"> 
+        </div>
+
+        <div class="input-field col s2">
+          <input  id="cost_1" type="text" class="validate" readonly>
+          <label for="cost_1" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+      <div class="row" id="drug_1_row">
+
+        <div class="input-field col s1">
+      <label>2 ). </label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_2" class="form-control" name="drug_2"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_2','drug_freq_2','drug_dur_2','cost_2')">
+          <datalist id="drug_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_2" class="form-control" name="drug_freq_2"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_2','drug_freq_2','drug_dur_2','cost_2')">
+          <datalist id="drug_feq_list"> 
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_2" class="form-control" name="drug_dur_2"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_2','drug_freq_2','drug_dur_2','cost_2')">
+          <datalist id="drug_dur_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+          <input  id="cost_2" type="text" class="validate" readonly>
+          <label for="cost_2" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="input-field col s1">
+      <label>3 ).</label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_3" class="form-control" name="drug_3"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_3','drug_freq_3','drug_dur_3','cost_3')">
+          <datalist id="drug_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_3" class="form-control" name="drug_freq_3"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_3','drug_freq_3','drug_dur_3','cost_3')">
+          <datalist id="drug_feq_list"> 
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_3" class="form-control" name="drug_dur_3"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_3','drug_freq_3','drug_dur_3','cost_3')">
+          <datalist id="drug_dur_list"> 
+        </div>
+
+        <div class="input-field col s2">
+          <input  id="cost_3" type="text" class="validate" readonly>
+          <label for="cost_3" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="input-field col s1">
+      <label>4 ).</label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_4" class="form-control" name="drug_4"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_4','drug_freq_4','drug_dur_4','cost_4')">
+          <datalist id="drug_list"> 
+        </div>
+
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_4" class="form-control" name="drug_freq_4"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_4','drug_freq_4','drug_dur_4','cost_4')">
+          <datalist id="drug_feq_list"> 
+        </div>
+
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_4" class="form-control" name="drug_dur_4"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_4','drug_freq_4','drug_dur_4','cost_4')">
+          <datalist id="drug_dur_list"> 
+        </div>
+
+        <div class="input-field col s2">
+          <input  id="cost_4" type="text" class="validate" readonly>
+          <label for="cost_4" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+ <div class="row">
+       <div class="input-field col s1">
+      <label>5 ).</label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_5" class="form-control" name="drug_5"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_5','drug_freq_5','drug_dur_5','cost_5')">
+          <datalist id="drug_list"> 
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_5" class="form-control" name="drug_freq_5"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_5','drug_freq_5','drug_dur_5','cost_5')">
+          <datalist id="drug_feq_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_5" class="form-control" name="drug_dur_5"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_5','drug_freq_5','drug_dur_5','cost_5')">
+          <datalist id="drug_dur_list"> 
+
+        </div>
+
+          <div class="input-field col s2">
+          <input  id="cost_5" type="text" class="validate" readonly>
+          <label for="cost_5" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="input-field col s1">
+      <label>6 ). </label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_6" class="form-control" name="drug_6"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_6','drug_freq_6','drug_dur_6','cost_6')">
+          <datalist id="drug_list"> 
+        </div>
+
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_6" class="form-control" name="drug_freq_6"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_6','drug_freq_6','drug_dur_6','cost_6')">
+          <datalist id="drug_feq_list"> 
+
+        </div>
+
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_6" class="form-control" name="drug_dur_6"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_6','drug_freq_6','drug_dur_6','cost_6')">
+          <datalist id="drug_dur_list"> 
+
+        </div>
+
+          <div class="input-field col s2">
+          <input  id="cost_6" type="text" class="validate" readonly>
+          <label for="cost_6" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="input-field col s1">
+      <label>7 ).</label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_7" class="form-control" name="drug_7"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_7','drug_freq_7','drug_dur_7','cost_7')">
+          <datalist id="drug_list"> 
+
+        </div>
+
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_7" class="form-control" name="drug_freq_7"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_7','drug_freq_7','drug_dur_7','cost_7')">
+          <datalist id="drug_feq_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_7" class="form-control" name="drug_dur_7"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_7','drug_freq_7','drug_dur_7','cost_7')">
+          <datalist id="drug_dur_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+          <input  id="cost_7" type="text" class="validate" readonly>
+          <label for="cost_7" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+      <div class="row">
+
+        <div class="input-field col s1">
+      <label>8 ).</label>
+      </div>
+        <div class="input-field col s4">
+
+          <input list="drug_list" id="drug_8" class="form-control" name="drug_8"  placeholder="Select the drug from the dropdown" onchange="runCalculation('drug_8','drug_freq_8','drug_dur_8','cost_8')">
+          <datalist id="drug_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_feq_list" id="drug_freq_8" class="form-control" name="drug_freq_8"  placeholder="Select frequency from the dropdown" onchange="runCalculation('drug_8','drug_freq_8','drug_dur_8','cost_8')">
+          <datalist id="drug_feq_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+
+          <input list="drug_dur_list" id="drug_dur_8" class="form-control" name="drug_dur_8"  placeholder="Select duration from the dropdown" onchange="runCalculation('drug_8','drug_freq_8','drug_dur_8','cost_8')">
+          <datalist id="drug_dur_list"> 
+
+        </div>
+
+        <div class="input-field col s2">
+          <input  id="cost_8" type="text" class="validate" readonly>
+          <label for="cost_8" >Cost : (LKR) </label>
+        </div>
+
+      </div>
+
+
+     </div>
+
+
+
+       <div class="section">
+      <h5>3.0. Medical Details : </h5>
+      <div class="row">
+      <div class="input-field col s2">
+      <label>4.1. Diagnosis : </label>
+      </div>
+        <div class="input-field col s4">
+          <input list="dx_list" id="diagnosis" class="form-control" name="diagnosis"  placeholder="Select diagnosis from the dropdown">
+          <datalist id="dx_list"> 
+        </div>
+
+          <div class="input-field col s3">
+          <input  id="fee" type="text" class="validate">
+          <label for="fee">4.2. Fee: (LKR)</label>
+        </div>
+
+      </div>
+      </div>
+
+
+      <div class="row">
+        <div class="input-field col s5">
+          <center><a class="waves-effect waves-light btn">Save Prescription</a></center>
+        </div>
+
+        <div class="input-field col s4">
+          <center><a class="waves-effect waves-light btn" onclick="createPrescription()" >Deliver Prescription</a></center>
+          
+        </div>
+      </div>
+
+    </form>
+
+    <div id="modalMessage" class="modal">
+      <div id="progress_indeter" class="block">
+        <div class="progress">
+        <div class="indeterminate"></div>
+      </div>
+      </div>
+      <div class="modal-content">
+        <h5 id="topictext">LOADING...</h5>
+        <a style="color:red" id="loaderTextLink_resetPass" href="#" target="_blank"></a>
+      </div>
+
+    </div>
+
+
+  </div>
+
+   </div>
+  </body>
+</html>
