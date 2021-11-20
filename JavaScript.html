@@ -1,0 +1,378 @@
+<script>
+
+var drugListGlobal = '';
+var drugIntervalGlobal = '';
+
+
+  $(document).ready(function(){
+    $('select').formSelect();
+
+    $('.datepicker').datepicker({
+    selectMonths: true, // Creates a dropdown to control month
+    selectYears: 1, // Creates a dropdown of 15 years to control year
+    format: "dd-mm-yyyy",
+    setDefaultDate: true
+    }
+    );
+
+    $('#radioaddmoreYes').change(function(event) {
+        $('#' + 'drug_addmore').removeClass('none');
+    });
+
+    $('#radioaddmoreNo').change(function(event) {
+        $('#' + 'drug_addmore').addClass('none');
+    });
+
+  });
+
+  function openModalMessage(){
+    // document.getElementById("loaderTextLink_msg").style.display="none";
+    const elem = document.getElementById('modalMessage');
+    const instance = M.Modal.init(elem, {dismissible: true});
+    instance.open();
+}
+
+function closeModalMessage(){
+    // document.getElementById("loaderTextLink_msg").style.display="none";
+    const elem = document.getElementById('modalMessage');
+    const instance = M.Modal.init(elem, {dismissible: true});
+    instance.close();
+}
+
+
+function runFirst(){
+
+    console.log('runFirst()');
+    openModalMessage();
+
+    google.script.run.withSuccessHandler((data_ws_drug) => {
+                    console.log('data_ws_drug :',data_ws_drug);
+                    updateDrugFields(data_ws_drug);
+                    drugListGlobal = data_ws_drug;
+                    closeModalMessage();
+
+
+                }).retrieveDrugDropdown();
+
+    google.script.run.withSuccessHandler((data_ws_drug_interval) => {
+                    console.log('data_ws_drug_interval :',data_ws_drug_interval);
+                    updateDrugInterval(data_ws_drug_interval);
+                    drugIntervalGlobal = data_ws_drug_interval;
+                    closeModalMessage();
+
+                }).retrieveDrugInterval();
+
+
+    google.script.run.withSuccessHandler((data_ws_DxList) => {
+                    console.log('data_ws_drug_interval :',data_ws_DxList);
+                    updateDxFields(data_ws_DxList);
+                    closeModalMessage();
+
+                }).retrieveDxList();
+
+    timeStamp();
+  }
+
+  function timeStamp(){
+    console.log("TIME : ", Math.floor(Date.now() / 1000))
+    document.getElementById('presID').value = 'P'+(Math.floor(Date.now() / 1000)).toString();
+    M.updateTextFields();
+  }
+
+
+function updateDrugFields(data_ws_drug) {
+
+    var id = 'drug_list';
+    var options = '';
+    for (var i = 1; i < data_ws_drug.length; i++) {
+        options += '<option value="' + data_ws_drug[i][0] + '" />';
+    }
+    document.getElementById(id).innerHTML = options;
+
+}
+
+
+function updateDrugInterval(data_ws_drug_interval) {
+
+    var id = 'drug_feq_list';
+    var options = '';
+    for (var i = 1; i < data_ws_drug_interval.length; i++) {
+        options += '<option value="' + data_ws_drug_interval[i][0] + '" />';
+    }
+    document.getElementById(id).innerHTML = options;
+
+    var id = 'drug_dur_list';
+    var options = '';
+    for (var i = 1; i < data_ws_drug_interval.length; i++) {
+        options += '<option value="' + data_ws_drug_interval[i][2] + '" />';
+    }
+    document.getElementById(id).innerHTML = options;
+
+}
+
+function updateDxFields(data_ws_DxList) {
+
+    var id = 'dx_list';
+    var options = '';
+    for (var i = 1; i < data_ws_DxList.length; i++) {
+        options += '<option value="' + data_ws_DxList[i][1] + '" />';
+    }
+    document.getElementById(id).innerHTML = options;
+
+}
+
+
+function runCalculation(drug_1,drug_freq_1,drug_feq_list,cost_1){
+
+  var drug_1_value = document.getElementById(drug_1).value;
+  var drug_freq_1 = document.getElementById(drug_freq_1).value;
+  var drug_feq_list = document.getElementById(drug_feq_list).value;
+
+  var drug_1_cost = '';
+  var drug_freq_1_count = '';
+  var drug_feq_list_count = '';
+
+  for (var i = 1; i < drugListGlobal.length; i++) {
+    if(drugListGlobal[i][0]==drug_1_value){
+      console.log("drug_1_value cost : ",drugListGlobal[i][4])
+      drug_1_cost = drugListGlobal[i][4];
+    }
+  }
+
+  for (var i = 1; i < drugIntervalGlobal.length; i++) {
+    if(drugIntervalGlobal[i][0]==drug_freq_1){
+      console.log("drug_freq_1 count : ",drugIntervalGlobal[i][1])
+      drug_freq_1_count = drugIntervalGlobal[i][1];
+    }
+  }
+
+  for (var i = 1; i < drugIntervalGlobal.length; i++) {
+    if(drugIntervalGlobal[i][2]==drug_feq_list){
+      console.log("drug_feq_list count : ",drugIntervalGlobal[i][3])
+      drug_feq_list_count = drugIntervalGlobal[i][3];
+    }
+  }
+
+  
+  if(drug_1_cost=="" && drug_freq_1_count==""&& drug_feq_list_count==""){
+    document.getElementById(cost_1).value='';
+    M.updateTextFields();
+
+  } else if(drug_1_cost=="" || drug_freq_1_count==""|| drug_feq_list_count==""){
+    document.getElementById(cost_1).value='N/A';
+    M.updateTextFields();
+
+  } else if(drug_1_cost*drug_freq_1_count*drug_feq_list_count==0){
+    document.getElementById(cost_1).value='';
+    M.updateTextFields();
+  }else{
+    document.getElementById(cost_1).value = drug_1_cost*drug_freq_1_count*drug_feq_list_count;
+    M.updateTextFields();
+  }
+
+
+  console.log(drug_1_value,drug_freq_1,drug_feq_list)
+}
+
+function createPrescription(){
+ console.log('createPrescription Clicked!')
+if (/^[a-zA-Z]{1,30}$/.test(document.getElementById("name").value) == false) {
+  showElement('name')
+} else if (/^(?:1[01][0-9]|120|1[7-9]|[2-9][0-9])$/.test(document.getElementById("age").value) == false) {
+  showElement('age')
+} else if (!document.getElementById("gender").value) {
+  showElement('gender')
+} else if (!document.getElementById("date").value) {
+  showElement('date')
+} else if (!document.getElementById("drug_1").value) {
+  showElement('drug_1')
+} else if (!document.getElementById("drug_freq_1").value) {
+  showElement('drug_freq_1')
+} else if (!document.getElementById("drug_dur_1").value) {
+  showElement('drug_dur_1')
+} else if (document.getElementById("cost_2").value=="N/A" && document.getElementById("drug_2").value=='') {
+  showElement('drug_2')
+} else if (document.getElementById("cost_2").value=="N/A" && document.getElementById("drug_freq_2").value=='') {
+  showElement('drug_freq_2')
+} else if (document.getElementById("cost_2").value=="N/A" && document.getElementById("drug_dur_2").value=='') {
+  showElement('drug_dur_2')
+
+} else if (document.getElementById("cost_3").value=="N/A" && document.getElementById("drug_3").value=='') {
+  showElement('drug_3')
+} else if (document.getElementById("cost_3").value=="N/A" && document.getElementById("drug_freq_3").value=='') {
+  showElement('drug_freq_3')
+} else if (document.getElementById("cost_3").value=="N/A" && document.getElementById("drug_dur_3").value=='') {
+  showElement('drug_dur_3')
+
+} else if (document.getElementById("cost_4").value=="N/A" && document.getElementById("drug_4").value=='') {
+  showElement('drug_4')
+} else if (document.getElementById("cost_4").value=="N/A" && document.getElementById("drug_freq_4").value=='') {
+  showElement('drug_freq_4')
+} else if (document.getElementById("cost_3").value=="N/A" && document.getElementById("drug_dur_4").value=='') {
+  showElement('drug_dur_4')
+
+} else if (document.getElementById("cost_5").value=="N/A" && document.getElementById("drug_5").value=='') {
+  showElement('drug_5')
+} else if (document.getElementById("cost_5").value=="N/A" && document.getElementById("drug_freq_5").value=='') {
+  showElement('drug_freq_5')
+} else if (document.getElementById("cost_5").value=="N/A" && document.getElementById("drug_dur_5").value=='') {
+  showElement('drug_dur_5')
+
+} else if (document.getElementById("cost_6").value=="N/A" && document.getElementById("drug_6").value=='') {
+  showElement('drug_6')
+} else if (document.getElementById("cost_6").value=="N/A" && document.getElementById("drug_freq_6").value=='') {
+  showElement('drug_freq_6')
+} else if (document.getElementById("cost_6").value=="N/A" && document.getElementById("drug_dur_6").value=='') {
+  showElement('drug_dur_6')
+
+} else if (document.getElementById("cost_7").value=="N/A" && document.getElementById("drug_7").value=='') {
+  showElement('drug_7')
+} else if (document.getElementById("cost_7").value=="N/A" && document.getElementById("drug_freq_7").value=='') {
+  showElement('drug_freq_7')
+} else if (document.getElementById("cost_7").value=="N/A" && document.getElementById("drug_dur_7").value=='') {
+  showElement('drug_dur_7')
+
+} else if (document.getElementById("cost_8").value=="N/A" && document.getElementById("drug_8").value=='') {
+  showElement('drug_8')
+} else if (document.getElementById("cost_8").value=="N/A" && document.getElementById("drug_freq_8").value=='') {
+  showElement('drug_freq_8')
+} else if (document.getElementById("cost_8").value=="N/A" && document.getElementById("drug_dur_8").value=='') {
+  showElement('drug_dur_8')
+
+} else if (document.getElementById("cost_8").value!="" && (
+  document.getElementById("cost_7").value=="" ||
+  document.getElementById("cost_6").value=="" ||
+  document.getElementById("cost_5").value=="" ||
+  document.getElementById("cost_4").value=="" ||
+  document.getElementById("cost_3").value=="" ||
+  document.getElementById("cost_2").value==""
+  )) {
+  showElement('drug_8')
+
+} else if (document.getElementById("cost_7").value!="" && (
+  document.getElementById("cost_6").value=="" ||
+  document.getElementById("cost_5").value=="" ||
+  document.getElementById("cost_4").value=="" ||
+  document.getElementById("cost_3").value=="" ||
+  document.getElementById("cost_2").value==""
+  )) {
+  showElement('drug_7')
+
+} else if (document.getElementById("cost_6").value!="" && (
+  document.getElementById("cost_5").value=="" ||
+  document.getElementById("cost_4").value=="" ||
+  document.getElementById("cost_3").value=="" ||
+  document.getElementById("cost_2").value==""
+  )) {
+  showElement('drug_6')
+
+} else if (document.getElementById("cost_5").value!="" && (
+  document.getElementById("cost_4").value=="" ||
+  document.getElementById("cost_3").value=="" ||
+  document.getElementById("cost_2").value==""
+  )) {
+  showElement('drug_5')
+
+} else if (document.getElementById("cost_4").value!="" && (
+  document.getElementById("cost_3").value=="" ||
+  document.getElementById("cost_2").value==""
+  )) {
+  showElement('drug_4')
+
+} else if (document.getElementById("cost_3").value!="" && (
+  document.getElementById("cost_2").value==""
+  )) {
+  showElement('drug_3')
+
+} else if (!document.getElementById("diagnosis").value) {
+  showElement('diagnosis')
+} else if (/^[0-9]*$/.test(document.getElementById("fee").value) == false) {
+  showElement('fee')
+
+}else{
+  console.log('Validation ongoing!')
+
+  var presData = {};
+  presData.presID = document.getElementById("presID").value;
+  presData.name = (document.getElementById("name").value).toUpperCase();
+  presData.age = document.getElementById("age").value;
+  presData.gender = document.getElementById("gender").value;
+  presData.date = document.getElementById("date").value;
+
+  presData.drug_1 = document.getElementById("drug_1").value;
+  presData.drug_freq_1 = document.getElementById("drug_freq_1").value;
+  presData.drug_dur_1 = document.getElementById("drug_dur_1").value;
+  presData.cost_1 = document.getElementById("cost_1").value;
+
+  presData.drug_2 = document.getElementById("drug_2").value;
+  presData.drug_freq_2 = document.getElementById("drug_freq_2").value;
+  presData.drug_dur_2 = document.getElementById("drug_dur_2").value;
+  presData.cost_2 = document.getElementById("cost_2").value;
+
+  presData.drug_3 = document.getElementById("drug_3").value;
+  presData.drug_freq_3 = document.getElementById("drug_freq_3").value;
+  presData.drug_dur_3 = document.getElementById("drug_dur_3").value;
+  presData.cost_3 = document.getElementById("cost_3").value;
+
+  presData.drug_4 = document.getElementById("drug_4").value;
+  presData.drug_freq_4 = document.getElementById("drug_freq_4").value;
+  presData.drug_dur_4 = document.getElementById("drug_dur_4").value;
+  presData.cost_4 = document.getElementById("cost_4").value;
+
+  presData.drug_5 = document.getElementById("drug_5").value;
+  presData.drug_freq_5 = document.getElementById("drug_freq_5").value;
+  presData.drug_dur_5 = document.getElementById("drug_dur_5").value;
+  presData.cost_5 = document.getElementById("cost_5").value;
+
+  presData.drug_6 = document.getElementById("drug_6").value;
+  presData.drug_freq_6 = document.getElementById("drug_freq_6").value;
+  presData.drug_dur_6 = document.getElementById("drug_dur_6").value;
+  presData.cost_6 = document.getElementById("cost_6").value;
+
+  presData.drug_7 = document.getElementById("drug_7").value;
+  presData.drug_freq_7 = document.getElementById("drug_freq_7").value;
+  presData.drug_dur_7 = document.getElementById("drug_dur_7").value;
+  presData.cost_7 = document.getElementById("cost_7").value;
+
+  presData.drug_8 = document.getElementById("drug_8").value;
+  presData.drug_freq_8 = document.getElementById("drug_freq_8").value;
+  presData.drug_dur_8 = document.getElementById("drug_dur_8").value;
+  presData.cost_8 = document.getElementById("cost_8").value;
+
+  presData.diagnosis = document.getElementById("diagnosis").value;
+  presData.fee = document.getElementById("fee").value;
+
+  openModalMessage();
+  google.script.run.withSuccessHandler(function(value) {
+
+      closeModalMessage();
+      console.log("returned : ", value)
+
+    }).saveToSheet(presData);
+
+}
+
+
+}
+
+
+
+function showElement(element){
+  document.getElementById(element).focus();
+  document.getElementById(element).style.borderColor = "red";
+  M.toast({html: 'Please enter the data in requested format!'})
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
